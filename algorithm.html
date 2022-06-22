@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알고리즘 문제2</title>
+    <script>
+       function solution(info, query) {
+  
+  let combination = new Map();
+    for(i=0;i<info.length;i++){
+        let infos=info[i].split(" ");
+        let score=Number(infos.pop());
+        let key=infos.join("");
+        combination.set(
+            key,combination.has(key)?[...combination.get(key),score]:[score]);
+  }
+  //for문을 infos의 길이만큼 반복적으로 돌려서 가능한 key와 value의 조합을 만듦
+    for(let [key, value] of combination){
+        combination.set(key, value.sort((a, b) => a - b));
+    }
+  //각 키 값에 대응하는 점수들의 항목들을 오른차순으로 정렬해줌(이분검색의 조건)
+
+    return query.map(e => {
+        const conditions = e.split(/-| |and/).filter(e=>e!="")
+        return search(combination, conditions);
+    });
+}
+
+const search = (combination, conditions) => {
+    let score = conditions.pop();
+    let answer = Array.from(combination.keys())
+        .filter(item => conditions.every(v => item.includes(v)))
+        .reduce((a, c) => a + combination.get(c).slice(binarySearch(combination.get(c), score)).length,0);
+    return answer
+}
+
+const binarySearch = (arr, target) => {
+    let lt = 0;
+    let rt = arr.length; 
+    while(lt <= rt){
+        let mid = parseInt((lt+rt)/2);
+        if(arr[mid] >= target){
+          rt = mid-1;
+        } 
+        else lt = mid + 1;
+    }
+
+    return lt;
+}
+let infos=["java backend junior pizza 150","python frontend senior chicken 210","python frontend senior chicken 150","cpp backend senior pizza 260","java backend junior chicken 80","python backend senior chicken 50"]
+let query=["java and backend and junior and pizza 100","python and frontend and senior and chicken 200","cpp and - and senior and pizza 250","- and backend and senior and - 150","- and - and - and chicken 100","- and - and - and - 150"]
+console.log(solution(infos,query))
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
